@@ -1,0 +1,1 @@
+Descrever o projeto e a equipe de forma geral
