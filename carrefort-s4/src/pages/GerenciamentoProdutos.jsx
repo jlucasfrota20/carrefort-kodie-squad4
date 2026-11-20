@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "../services/supabase";
 import "./GerenciamentoProdutos.css";
@@ -69,8 +68,8 @@ function formatQuantity(value, unit) {
   })} ${unit || "UN"}`;
 }
 
-function GerenciamentoProdutos() {
-  const [activeTab, setActiveTab] = useState("stock");
+function GerenciamentoProdutos({ initialTab = "stock", showTabs = true }) {
+  const [activeTab, setActiveTab] = useState(initialTab);
 
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
@@ -97,6 +96,14 @@ function GerenciamentoProdutos() {
   const [feedback, setFeedback] = useState("");
   const [modalMessage, setModalMessage] = useState("");
   const [loadError, setLoadError] = useState("");
+
+  // Sincroniza a seção selecionada no menu lateral.
+  useEffect(() => {
+    setActiveTab(initialTab);
+    setSearch("");
+    setFilters({ ...emptyFilters });
+    setShowFilters(false);
+  }, [initialTab]);
 
   // Busca os dados do estoque
   const loadData = useCallback(async () => {
@@ -380,13 +387,17 @@ function GerenciamentoProdutos() {
   }
 
   function clearModalForm() {
-    if (modal === "product" ||
-        (modal === "register" && registerStep === "product")) {
+    if (
+      modal === "product" ||
+      (modal === "register" && registerStep === "product")
+    ) {
       setProductForm({ ...emptyProduct });
     }
 
-    if (modal === "lot" ||
-        (modal === "register" && registerStep === "lot")) {
+    if (
+      modal === "lot" ||
+      (modal === "register" && registerStep === "lot")
+    ) {
       setLotForm({ ...emptyLot });
       setLotSearch("");
     }
@@ -558,7 +569,9 @@ function GerenciamentoProdutos() {
     }
 
     if (lotForm.unit === "UN" && !Number.isInteger(quantity)) {
-      setModalMessage("A quantidade deve ser um número inteiro para produtos por unidade.");
+      setModalMessage(
+        "A quantidade deve ser um número inteiro para produtos por unidade."
+      );
       setSaving(false);
       return;
     }
@@ -651,12 +664,29 @@ function GerenciamentoProdutos() {
     modal === "lot" ||
     (modal === "register" && registerStep === "lot");
 
+  const pageInfo = {
+    stock: {
+      title: "Estoque",
+      description: "Acompanhe lotes, quantidades disponíveis e validades.",
+    },
+    products: {
+      title: "Produtos",
+      description: "Consulte e gerencie os produtos cadastrados.",
+    },
+    movements: {
+      title: "Movimentações",
+      description: "Acompanhe as saídas registradas no estoque.",
+    },
+  };
+
+  const currentPage = pageInfo[activeTab] || pageInfo.stock;
+
   return (
     <div className="inventory-page">
       <header className="inventory-header">
         <div>
-          <h1>Gerenciamento de Estoque</h1>
-          <p>Produtos, lotes e movimentações.</p>
+          <h1>{currentPage.title}</h1>
+          <p>{currentPage.description}</p>
         </div>
 
         <button
@@ -668,53 +698,57 @@ function GerenciamentoProdutos() {
         </button>
       </header>
 
-      <div className="inventory-stats">
-        <div className="stat-card">
-          <span>Produtos</span>
-          <strong>{products.length}</strong>
+      {activeTab === "stock" && (
+        <div className="inventory-stats">
+          <div className="stat-card">
+            <span>Produtos</span>
+            <strong>{products.length}</strong>
+          </div>
+
+          <div className="stat-card">
+            <span>Lotes</span>
+            <strong>{lots.length}</strong>
+          </div>
+
+          <div className="stat-card">
+            <span>Lotes disponíveis</span>
+            <strong>{availableLots}</strong>
+          </div>
+
+          <div className="stat-card">
+            <span>Sem estoque</span>
+            <strong>{emptyLotsCount}</strong>
+          </div>
         </div>
+      )}
 
-        <div className="stat-card">
-          <span>Lotes</span>
-          <strong>{lots.length}</strong>
+      {showTabs && (
+        <div className="inventory-tabs">
+          <button
+            type="button"
+            className={activeTab === "stock" ? "active" : ""}
+            onClick={() => changeTab("stock")}
+          >
+            Estoque
+          </button>
+
+          <button
+            type="button"
+            className={activeTab === "products" ? "active" : ""}
+            onClick={() => changeTab("products")}
+          >
+            Produtos
+          </button>
+
+          <button
+            type="button"
+            className={activeTab === "movements" ? "active" : ""}
+            onClick={() => changeTab("movements")}
+          >
+            Movimentações
+          </button>
         </div>
-
-        <div className="stat-card">
-          <span>Lotes disponíveis</span>
-          <strong>{availableLots}</strong>
-        </div>
-
-        <div className="stat-card">
-          <span>Sem estoque</span>
-          <strong>{emptyLotsCount}</strong>
-        </div>
-      </div>
-
-      <div className="inventory-tabs">
-        <button
-          type="button"
-          className={activeTab === "stock" ? "active" : ""}
-          onClick={() => changeTab("stock")}
-        >
-          Estoque
-        </button>
-
-        <button
-          type="button"
-          className={activeTab === "products" ? "active" : ""}
-          onClick={() => changeTab("products")}
-        >
-          Produtos
-        </button>
-
-        <button
-          type="button"
-          className={activeTab === "movements" ? "active" : ""}
-          onClick={() => changeTab("movements")}
-        >
-          Movimentações
-        </button>
-      </div>
+      )}
 
       <div className="inventory-toolbar">
         <input
@@ -842,20 +876,35 @@ function GerenciamentoProdutos() {
                     <tr key={lot.id}>
                       <td>{lot.product?.name || "-"}</td>
                       <td>{lot.lot_code || "-"}</td>
-                      <td>{formatQuantity(lot.quantity_received, lot.product?.unit)}</td>
+                      <td>
+                        {formatQuantity(
+                          lot.quantity_received,
+                          lot.product?.unit
+                        )}
+                      </td>
                       <td>{formatQuantity(lot.sold, lot.product?.unit)}</td>
                       <td>{formatQuantity(lot.donated, lot.product?.unit)}</td>
-                      <td>{formatQuantity(lot.discarded, lot.product?.unit)}</td>
-                      <td>{formatQuantity(lot.available, lot.product?.unit)}</td>
+                      <td>
+                        {formatQuantity(lot.discarded, lot.product?.unit)}
+                      </td>
+                      <td>
+                        {formatQuantity(lot.available, lot.product?.unit)}
+                      </td>
                       <td>{formatDate(lot.expiration_date)}</td>
                       <td>
                         <span className={`status status-${lot.validity}`}>
                           {validityLabels[lot.validity]}
                         </span>
-                        <span className={`status ${
-                          lot.available > 0 ? "status-available" : "status-empty"
-                        }`}>
-                          {lot.available > 0 ? "Disponível" : "Fora de estoque"}
+                        <span
+                          className={`status ${
+                            lot.available > 0
+                              ? "status-available"
+                              : "status-empty"
+                          }`}
+                        >
+                          {lot.available > 0
+                            ? "Disponível"
+                            : "Fora de estoque"}
                         </span>
                       </td>
                       <td>
@@ -950,15 +999,21 @@ function GerenciamentoProdutos() {
 
                     return (
                       <tr key={movement.id}>
-                        <td>{new Date(movement.created_at).toLocaleString("pt-BR")}</td>
+                        <td>
+                          {new Date(movement.created_at).toLocaleString("pt-BR")}
+                        </td>
                         <td>{product?.name || "-"}</td>
                         <td>{lot?.lot_code || "-"}</td>
                         <td>
-                          <span className={`status status-${movement.movement_type.toLowerCase()}`}>
+                          <span
+                            className={`status status-${movement.movement_type.toLowerCase()}`}
+                          >
                             {movementLabels[movement.movement_type]}
                           </span>
                         </td>
-                        <td>{formatQuantity(movement.quantity, product?.unit)}</td>
+                        <td>
+                          {formatQuantity(movement.quantity, product?.unit)}
+                        </td>
                         <td>{movement.notes || "-"}</td>
                       </tr>
                     );
@@ -967,7 +1022,9 @@ function GerenciamentoProdutos() {
               </table>
 
               {filteredMovements.length === 0 && (
-                <p className="empty-state">Nenhuma movimentação encontrada.</p>
+                <p className="empty-state">
+                  Nenhuma movimentação encontrada.
+                </p>
               )}
             </div>
           )}
@@ -976,9 +1033,12 @@ function GerenciamentoProdutos() {
 
       {/* Central de registro */}
       {modal === "register" && registerStep === "choose" && (
-        <div className="modal-backdrop" onMouseDown={(event) => {
-          if (event.target === event.currentTarget) closeModal();
-        }}>
+        <div
+          className="modal-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closeModal();
+          }}
+        >
           <div className="modal register-modal">
             <div className="modal-header">
               <div>
@@ -986,7 +1046,11 @@ function GerenciamentoProdutos() {
                 <p>Escolha o que deseja adicionar ao estoque.</p>
               </div>
 
-              <button type="button" className="modal-close" onClick={closeModal}>
+              <button
+                type="button"
+                className="modal-close"
+                onClick={closeModal}
+              >
                 ×
               </button>
             </div>
@@ -1031,7 +1095,11 @@ function GerenciamentoProdutos() {
             </div>
 
             <div className="modal-actions">
-              <button type="button" className="button-secondary" onClick={closeModal}>
+              <button
+                type="button"
+                className="button-secondary"
+                onClick={closeModal}
+              >
                 Fechar
               </button>
             </div>
@@ -1041,17 +1109,26 @@ function GerenciamentoProdutos() {
 
       {/* Cadastro e edição de produto */}
       {(modal === "product" || showProductForm) && (
-        <div className="modal-backdrop" onMouseDown={(event) => {
-          if (event.target === event.currentTarget) closeModal();
-        }}>
+        <div
+          className="modal-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closeModal();
+          }}
+        >
           <div className="modal form-modal">
             <div className="modal-header">
               <div>
-                <h2>{editingProduct ? "Editar produto" : "Cadastrar produto"}</h2>
+                <h2>
+                  {editingProduct ? "Editar produto" : "Cadastrar produto"}
+                </h2>
                 <p>Informações do produto.</p>
               </div>
 
-              <button type="button" className="modal-close" onClick={closeModal}>
+              <button
+                type="button"
+                className="modal-close"
+                onClick={closeModal}
+              >
                 ×
               </button>
             </div>
@@ -1121,30 +1198,54 @@ function GerenciamentoProdutos() {
                     <option value="L">Litro (L)</option>
                   </select>
                   {editingProductHasLots && (
-                    <small>Não é possível alterar a unidade porque já existem lotes.</small>
+                    <small>
+                      Não é possível alterar a unidade porque já existem lotes.
+                    </small>
                   )}
                 </label>
               </div>
 
-              {modalMessage && <p className="modal-message">{modalMessage}</p>}
+              {modalMessage && (
+                <p className="modal-message">{modalMessage}</p>
+              )}
 
               <div className="modal-actions">
-                <button type="button" className="button-text" onClick={clearModalForm}>
+                <button
+                  type="button"
+                  className="button-text"
+                  onClick={clearModalForm}
+                >
                   Limpar
                 </button>
 
                 {modal === "register" && (
-                  <button type="button" className="button-secondary" onClick={backToRegister}>
+                  <button
+                    type="button"
+                    className="button-secondary"
+                    onClick={backToRegister}
+                  >
                     Voltar
                   </button>
                 )}
 
-                <button type="button" className="button-secondary" onClick={closeModal}>
+                <button
+                  type="button"
+                  className="button-secondary"
+                  onClick={closeModal}
+                >
                   Fechar
                 </button>
 
-                <button type="submit" className="button-primary" disabled={saving}>
-                  {saving ? "Salvando..." : editingProduct ? "Salvar alterações" : "Cadastrar"}
+                <button
+                  type="submit"
+                  className="button-primary"
+                  disabled={saving}
+                >
+                  {saving
+                    ? "Salvando..."
+                    : editingProduct
+                    ? "Salvar alterações"
+                    : "Cadastrar"}
                 </button>
               </div>
             </form>
@@ -1154,9 +1255,12 @@ function GerenciamentoProdutos() {
 
       {/* Cadastro e edição de lote */}
       {(modal === "lot" || showLotForm) && (
-        <div className="modal-backdrop" onMouseDown={(event) => {
-          if (event.target === event.currentTarget) closeModal();
-        }}>
+        <div
+          className="modal-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closeModal();
+          }}
+        >
           <div className="modal form-modal">
             <div className="modal-header">
               <div>
@@ -1164,7 +1268,11 @@ function GerenciamentoProdutos() {
                 <p>Selecione um produto e informe os dados do lote.</p>
               </div>
 
-              <button type="button" className="modal-close" onClick={closeModal}>
+              <button
+                type="button"
+                className="modal-close"
+                onClick={closeModal}
+              >
                 ×
               </button>
             </div>
@@ -1206,7 +1314,9 @@ function GerenciamentoProdutos() {
                           </button>
                         ))
                       ) : (
-                        <p className="search-empty">Nenhum produto encontrado.</p>
+                        <p className="search-empty">
+                          Nenhum produto encontrado.
+                        </p>
                       )}
                     </div>
                   </>
@@ -1299,20 +1409,34 @@ function GerenciamentoProdutos() {
                 </p>
               )}
 
-              {modalMessage && <p className="modal-message">{modalMessage}</p>}
+              {modalMessage && (
+                <p className="modal-message">{modalMessage}</p>
+              )}
 
               <div className="modal-actions">
-                <button type="button" className="button-text" onClick={clearModalForm}>
+                <button
+                  type="button"
+                  className="button-text"
+                  onClick={clearModalForm}
+                >
                   Limpar
                 </button>
 
                 {modal === "register" && (
-                  <button type="button" className="button-secondary" onClick={backToRegister}>
+                  <button
+                    type="button"
+                    className="button-secondary"
+                    onClick={backToRegister}
+                  >
                     Voltar
                   </button>
                 )}
 
-                <button type="button" className="button-secondary" onClick={closeModal}>
+                <button
+                  type="button"
+                  className="button-secondary"
+                  onClick={closeModal}
+                >
                   Fechar
                 </button>
 
@@ -1321,7 +1445,11 @@ function GerenciamentoProdutos() {
                   className="button-primary"
                   disabled={saving || !selectedProduct}
                 >
-                  {saving ? "Salvando..." : editingLot ? "Salvar alterações" : "Cadastrar"}
+                  {saving
+                    ? "Salvando..."
+                    : editingLot
+                    ? "Salvar alterações"
+                    : "Cadastrar"}
                 </button>
               </div>
             </form>
