@@ -640,3 +640,74 @@
     width: 104px;
   }
 }
+
+
+/* Modal de movimentação de estoque */
+.movement-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.movement-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.movement-form input,
+.movement-form select,
+.movement-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  color: #222;
+  font: inherit;
+}
+
+.movement-form textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.movement-form input:focus,
+.movement-form select:focus,
+.movement-form textarea:focus {
+  outline: none;
+  border-color: #555;
+}
+
+.movement-stock-info {
+  padding: 14px 16px;
+  border: 1px solid #dce8df;
+  border-radius: 8px;
+  background: #f1f8f3;
+  color: #187644;
+  font-size: 14px;
+}
+
+.movement-expired-warning {
+  padding: 14px 16px;
+  border: 1px solid #f2c7c3;
+  border-radius: 8px;
+  background: #fff1f0;
+  color: #b42318;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.movement-form .modal-message {
+  padding: 12px;
+  border-radius: 6px;
+  background: #fff1f0;
+}
+
+.movement-form .modal-actions {
+  margin-top: 4px;
+}

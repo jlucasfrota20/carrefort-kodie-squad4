@@ -1,6 +1,10 @@
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "./services/supabase";
 import GerenciamentoProdutos from "./pages/GerenciamentoProdutos";
+import Alertas from "./pages/Alertas";
+import Ofertas from "./pages/Ofertas";
+import VitrineOfertas from "./pages/VitrineOfertas";
 import "./App.css";
 
 const navigation = [
@@ -51,10 +55,25 @@ function formatQuantity(value, unit) {
   })} ${unit || "UN"}`;
 }
 
+// Formata os totais sem misturar unidades diferentes
+function formatUnitSummary(totals) {
+  return Object.entries(totals)
+    .filter(([, quantity]) => quantity > 0)
+    .map(([unit, quantity]) => formatQuantity(quantity, unit))
+    .join(" · ") || "0";
+}
+
 function App() {
   const [activePage, setActivePage] = useState("overview");
 
   const inventoryPages = ["stock", "products", "movements"];
+
+  const currentPath =
+    window.location.pathname.replace(/\/+$/, "") || "/";
+
+  if (currentPath === "/ofertas") {
+    return <VitrineOfertas />;
+  }
 
   return (
     <div className="app-shell">
@@ -124,17 +143,11 @@ function App() {
         )}
 
         {activePage === "alerts" && (
-          <ModulePlaceholder
-            title="Alertas"
-            description="Acompanhe produtos vencidos e lotes próximos do vencimento."
-          />
+          <Alertas onNavigate={setActivePage} />
         )}
 
         {activePage === "offers" && (
-          <ModulePlaceholder
-            title="Ofertas"
-            description="Gerencie os produtos disponíveis para ofertas de última hora."
-          />
+          <Ofertas onNavigate={setActivePage} />
         )}
 
       </main>
@@ -147,6 +160,7 @@ function DashboardOverview({ onNavigate }) {
   const [products, setProducts] = useState([]);
   const [lots, setLots] = useState([]);
   const [movements, setMovements] = useState([]);
+  const [offers, setOffers] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
@@ -160,6 +174,7 @@ function DashboardOverview({ onNavigate }) {
       productsResult,
       lotsResult,
       movementsResult,
+      offersResult,
     ] = await Promise.all([
       supabase
         .from("products")
@@ -168,12 +183,19 @@ function DashboardOverview({ onNavigate }) {
 
       supabase
         .from("lots")
-        .select("id, product_id, lot_code, quantity_received, expiration_date")
+        .select(
+          "id, product_id, lot_code, quantity_received, expiration_date"
+        )
         .order("expiration_date"),
 
       supabase
         .from("stock_movements")
         .select("id, lot_id, movement_type, quantity, created_at")
+        .order("created_at", { ascending: false }),
+
+      supabase
+        .from("offers")
+        .select("id, lot_id, is_active, created_at")
         .order("created_at", { ascending: false }),
     ]);
 
@@ -181,22 +203,87 @@ function DashboardOverview({ onNavigate }) {
       productsResult.error,
       lotsResult.error,
       movementsResult.error,
+      offersResult.error,
     ].filter(Boolean);
 
     if (errors.length) {
       console.error("Erro ao carregar painel:", errors);
-      setLoadError("Não foi possível carregar todos os dados do painel.");
+      setLoadError(
+        "Não foi possível carregar todos os dados do painel."
+      );
     }
 
     setProducts(productsResult.data || []);
     setLots(lotsResult.data || []);
     setMovements(movementsResult.data || []);
+    setOffers(offersResult.data || []);
 
     setLoading(false);
   }, []);
 
+  // Primeira carga dos dados
   useEffect(() => {
     loadDashboard();
+  }, [loadDashboard]);
+
+  // Atualiza o painel quando houver alterações no banco
+  useEffect(() => {
+    const channel = supabase
+      .channel("dashboard-overview-realtime")
+
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "offers",
+        },
+        () => {
+          loadDashboard();
+        }
+      )
+
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "lots",
+        },
+        () => {
+          loadDashboard();
+        }
+      )
+
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "stock_movements",
+        },
+        () => {
+          loadDashboard();
+        }
+      )
+
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "products",
+        },
+        () => {
+          loadDashboard();
+        }
+      )
+
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [loadDashboard]);
 
   // Relaciona produtos, lotes e movimentações
@@ -224,7 +311,9 @@ function DashboardOverview({ onNavigate }) {
         ...lot,
         product,
         available,
-        daysUntilExpiration: getDaysUntilExpiration(lot.expiration_date),
+        daysUntilExpiration: getDaysUntilExpiration(
+          lot.expiration_date
+        ),
       };
     });
   }, [products, lots, movements]);
@@ -308,16 +397,16 @@ function DashboardOverview({ onNavigate }) {
       .slice(0, 5);
   }, [lotsWithInfo]);
 
-  // Controle de perdas dos últimos 30 dias
+  // Destinação dos produtos nos últimos 7 dias
   const lossSummary = useMemo(() => {
     const result = {
-      VENDIDO: {},
-      DOADO: {},
-      DESCARTADO: {},
+      VENDIDO: { UN: 0, KG: 0, L: 0 },
+      DOADO: { UN: 0, KG: 0, L: 0 },
+      DESCARTADO: { UN: 0, KG: 0, L: 0 },
     };
 
     const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - 30);
+    cutoff.setDate(cutoff.getDate() - 7);
 
     movements.forEach((movement) => {
       if (
@@ -337,13 +426,33 @@ function DashboardOverview({ onNavigate }) {
 
       const unit = product?.unit || "UN";
 
-      result[movement.movement_type][unit] =
-        (result[movement.movement_type][unit] || 0) +
+      if (!Object.hasOwn(result[movement.movement_type], unit)) {
+        return;
+      }
+
+      result[movement.movement_type][unit] +=
         Number(movement.quantity);
     });
 
     return result;
   }, [movements, lots, products]);
+
+  // Quantidade recuperada: vendido + doado
+  const recoveredSummary = useMemo(() => {
+    const recovered = {
+      UN: 0,
+      KG: 0,
+      L: 0,
+    };
+
+    ["UN", "KG", "L"].forEach((unit) => {
+      recovered[unit] =
+        lossSummary.VENDIDO[unit] +
+        lossSummary.DOADO[unit];
+    });
+
+    return recovered;
+  }, [lossSummary]);
 
   // Movimentações recentes
   const recentMovements = useMemo(() => {
@@ -363,6 +472,50 @@ function DashboardOverview({ onNavigate }) {
       };
     });
   }, [movements, lots, products]);
+
+  // Ofertas disponíveis para os clientes
+  const availableOffers = useMemo(() => {
+    return offers
+      .filter((offer) => offer.is_active)
+      .map((offer) => {
+        const lot = lotsWithInfo.find(
+          (item) => item.id === offer.lot_id
+        );
+
+        return {
+          ...offer,
+          lot,
+        };
+      })
+      .filter(
+        (offer) =>
+          offer.lot &&
+          offer.lot.available > 0 &&
+          offer.lot.daysUntilExpiration >= 0
+      );
+  }, [offers, lotsWithInfo]);
+
+  // Ofertas pausadas
+  const pausedOffersCount = useMemo(() => {
+    return offers.filter((offer) => !offer.is_active).length;
+  }, [offers]);
+
+  // Ofertas ativas, mas sem disponibilidade
+  const unavailableOffersCount = useMemo(() => {
+    return offers.filter((offer) => {
+      if (!offer.is_active) return false;
+
+      const lot = lotsWithInfo.find(
+        (item) => item.id === offer.lot_id
+      );
+
+      return (
+        !lot ||
+        lot.available <= 0 ||
+        lot.daysUntilExpiration < 0
+      );
+    }).length;
+  }, [offers, lotsWithInfo]);
 
   const metrics = [
     {
@@ -417,7 +570,7 @@ function DashboardOverview({ onNavigate }) {
         <p className="feedback error">{loadError}</p>
       )}
 
-      {/* INDICADORES */}
+      {/* INDICADORES PRINCIPAIS */}
       <section className="overview-metrics">
 
         {metrics.map((metric) => (
@@ -455,31 +608,41 @@ function DashboardOverview({ onNavigate }) {
             <div>
               <span className="expiration-dot expired"></span>
               Vencidos
-              <strong>{loading ? "..." : expirationCounts.expired}</strong>
+              <strong>
+                {loading ? "..." : expirationCounts.expired}
+              </strong>
             </div>
 
             <div>
               <span className="expiration-dot today"></span>
               Vencem hoje
-              <strong>{loading ? "..." : expirationCounts.today}</strong>
+              <strong>
+                {loading ? "..." : expirationCounts.today}
+              </strong>
             </div>
 
             <div>
               <span className="expiration-dot warning"></span>
               Em até 2 dias
-              <strong>{loading ? "..." : expirationCounts.twoDays}</strong>
+              <strong>
+                {loading ? "..." : expirationCounts.twoDays}
+              </strong>
             </div>
 
             <div>
               <span className="expiration-dot upcoming"></span>
               Em até 5 dias
-              <strong>{loading ? "..." : expirationCounts.fiveDays}</strong>
+              <strong>
+                {loading ? "..." : expirationCounts.fiveDays}
+              </strong>
             </div>
 
             <div>
               <span className="expiration-dot expired"></span>
               Produtos sem estoque
-              <strong>{loading ? "..." : emptyProducts.length}</strong>
+              <strong>
+                {loading ? "..." : emptyProducts.length}
+              </strong>
             </div>
           </div>
 
@@ -501,7 +664,9 @@ function DashboardOverview({ onNavigate }) {
           </div>
 
           {loading ? (
-            <p className="panel-empty">Carregando movimentações...</p>
+            <p className="panel-empty">
+              Carregando movimentações...
+            </p>
           ) : recentMovements.length > 0 ? (
             <div className="recent-movements">
               {recentMovements.map((movement) => (
@@ -513,12 +678,17 @@ function DashboardOverview({ onNavigate }) {
                       {movementLabels[movement.movement_type] ||
                         movement.movement_type}
                       {" · "}
-                      {new Date(movement.created_at).toLocaleDateString("pt-BR")}
+                      {new Date(
+                        movement.created_at
+                      ).toLocaleDateString("pt-BR")}
                     </span>
                   </div>
 
                   <strong>
-                    {formatQuantity(movement.quantity, movement.unit)}
+                    {formatQuantity(
+                      movement.quantity,
+                      movement.unit
+                    )}
                   </strong>
                 </div>
               ))}
@@ -540,31 +710,27 @@ function DashboardOverview({ onNavigate }) {
 
       </section>
 
-      {/* CONTROLE DE PERDAS E PRODUTOS PRIORITÁRIOS */}
+      {/* DESTINAÇÃO DOS PRODUTOS E PRODUTOS PRIORITÁRIOS */}
       <section className="overview-panels">
 
         <article className="overview-panel">
           <div className="panel-header">
             <div>
-              <h2>Controle de perdas</h2>
-              <p>Movimentações dos últimos 30 dias.</p>
+              <h2>Destinação dos produtos</h2>
+              <p>Movimentações dos últimos 7 dias.</p>
             </div>
           </div>
 
           <div className="loss-summary">
             {["VENDIDO", "DOADO", "DESCARTADO"].map((type) => {
-              const totals = lossSummary[type];
-
-              const summary = Object.entries(totals)
-                .filter(([, quantity]) => quantity > 0)
-                .map(([unit, quantity]) => formatQuantity(quantity, unit))
-                .join(" · ");
+              const summary = formatUnitSummary(lossSummary[type]);
 
               return (
                 <div className="loss-item" key={type}>
                   <span>{movementLabels[type]}</span>
+
                   <strong>
-                    {loading ? "..." : summary || "0"}
+                    {loading ? "..." : summary}
                   </strong>
                 </div>
               );
@@ -589,17 +755,25 @@ function DashboardOverview({ onNavigate }) {
           </div>
 
           {loading ? (
-            <p className="panel-empty">Carregando produtos...</p>
+            <p className="panel-empty">
+              Carregando produtos...
+            </p>
           ) : priorityLots.length > 0 ? (
             <div className="priority-list">
               {priorityLots.map((lot) => (
                 <div className="priority-item" key={lot.id}>
                   <div>
-                    <strong>{lot.product?.name || "Produto"}</strong>
+                    <strong>
+                      {lot.product?.name || "Produto"}
+                    </strong>
+
                     <span>
                       Lote: {lot.lot_code || "-"}
                       {" · "}
-                      {formatQuantity(lot.available, lot.product?.unit)}
+                      {formatQuantity(
+                        lot.available,
+                        lot.product?.unit
+                      )}
                     </span>
                   </div>
 
@@ -636,42 +810,207 @@ function DashboardOverview({ onNavigate }) {
 
       </section>
 
-      {/* OFERTAS */}
+      {/* OFERTAS DE ÚLTIMA HORA */}
       <section className="overview-panel">
         <div className="panel-header">
           <div>
             <h2>Ofertas de última hora</h2>
-            <p>Produtos disponíveis para os clientes.</p>
+            <p>
+              Ofertas ativas com estoque disponível e validade em dia.
+            </p>
           </div>
         </div>
 
-        <p className="panel-empty">
-          O gerenciamento de ofertas será integrado nesta área.
-        </p>
+        {loading ? (
+          <p className="panel-empty">
+            Carregando ofertas...
+          </p>
+        ) : availableOffers.length > 0 ? (
+          <>
+            <div className="priority-list">
+              {availableOffers.slice(0, 5).map((offer) => (
+                <div className="priority-item" key={offer.id}>
+                  <div>
+                    <strong>
+                      {offer.lot.product?.name || "Produto"}
+                    </strong>
+
+                    <span>
+                      Lote: {offer.lot.lot_code || "-"}
+                      {" · "}
+                      {formatQuantity(
+                        offer.lot.available,
+                        offer.lot.product?.unit
+                      )}
+                    </span>
+                  </div>
+
+                  <span className="status status-twoDays">
+                    {offer.lot.daysUntilExpiration === 0
+                      ? "Vence hoje"
+                      : `Vence em ${offer.lot.daysUntilExpiration} dias`}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {availableOffers.length > 5 && (
+              <p className="panel-empty">
+                E mais {availableOffers.length - 5} oferta(s) ativa(s).
+              </p>
+            )}
+          </>
+        ) : (
+          <p className="panel-empty">
+            Nenhuma oferta disponível no momento.
+          </p>
+        )}
+
+        <div className="loss-summary">
+          <div className="loss-item">
+            <span>Ofertas disponíveis</span>
+            <strong>
+              {loading ? "..." : availableOffers.length}
+            </strong>
+          </div>
+
+          <div className="loss-item">
+            <span>Ofertas pausadas</span>
+            <strong>
+              {loading ? "..." : pausedOffersCount}
+            </strong>
+          </div>
+
+          <div className="loss-item">
+            <span>Sem disponibilidade</span>
+            <strong>
+              {loading ? "..." : unavailableOffersCount}
+            </strong>
+          </div>
+        </div>
 
         <button
           type="button"
           className="dashboard-link"
           onClick={() => onNavigate("offers")}
         >
-          Acessar ofertas →
+          Gerenciar ofertas →
+        </button>
+
+        <button
+          type="button"
+          className="dashboard-link"
+          onClick={loadDashboard}
+          disabled={loading}
+        >
+          {loading ? "Atualizando..." : "Atualizar painel ↻"}
         </button>
       </section>
 
-    </div>
-  );
-}
+{/* IMPACTO NA REDUÇÃO DO DESPERDÍCIO */}
+      <section className="overview-panel impact-panel">
 
-function ModulePlaceholder({ title, description }) {
-  return (
-    <div className="module-placeholder">
-      <span className="page-eyebrow">CARREFORT</span>
-      <h1>{title}</h1>
-      <p>{description}</p>
+        <div className="panel-header">
+          <div>
+            <h2>Impacto na redução do desperdício</h2>
+            <p>
+              Destinação dos produtos registrados nos últimos 7 dias.
+            </p>
+          </div>
+        </div>
 
-      <span className="module-status">
-        Módulo em desenvolvimento
-      </span>
+        <div className="overview-metrics">
+
+          <article className="overview-card">
+            <div className="metric-top">
+              <span className="metric-icon">↗</span>
+            </div>
+
+            <span className="metric-title">
+              Vendido
+            </span>
+
+            <strong className="metric-value">
+              {loading
+                ? "..."
+                : formatUnitSummary(lossSummary.VENDIDO)}
+            </strong>
+
+            <span className="metric-description">
+              Produtos comercializados
+            </span>
+          </article>
+
+          <article className="overview-card">
+            <div className="metric-top">
+              <span className="metric-icon">♡</span>
+            </div>
+
+            <span className="metric-title">
+              Doado
+            </span>
+
+            <strong className="metric-value">
+              {loading
+                ? "..."
+                : formatUnitSummary(lossSummary.DOADO)}
+            </strong>
+
+            <span className="metric-description">
+              Produtos destinados à doação
+            </span>
+          </article>
+
+          <article className="overview-card">
+            <div className="metric-top">
+              <span className="metric-icon">!</span>
+            </div>
+
+            <span className="metric-title">
+              Descartado
+            </span>
+
+            <strong className="metric-value">
+              {loading
+                ? "..."
+                : formatUnitSummary(lossSummary.DESCARTADO)}
+            </strong>
+
+            <span className="metric-description">
+              Produtos registrados como perda
+            </span>
+          </article>
+
+          <article className="overview-card">
+            <div className="metric-top">
+              <span className="metric-icon">✓</span>
+            </div>
+
+            <span className="metric-title">
+              Recuperado
+            </span>
+
+            <strong className="metric-value">
+              {loading
+                ? "..."
+                : formatUnitSummary(recoveredSummary)}
+            </strong>
+
+            <span className="metric-description">
+              Vendido + doado
+            </span>
+          </article>
+
+        </div>
+
+        <p className="dashboard-disclaimer">
+          Os valores representam movimentações registradas no sistema.
+          A quantidade recuperada corresponde à soma de produtos vendidos
+          e doados, não a uma estimativa de desperdício evitado.
+        </p>
+
+      </section>
+      
     </div>
   );
 }

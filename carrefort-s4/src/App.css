@@ -631,3 +631,12 @@
     font-size: 12px;
   }
 }
+
+.dashboard-disclaimer {
+  font-size: 11px;
+  color: #8a8f98;
+  line-height: 1.5;
+  margin-top: 20px;
+  text-align: center;
+  font-weight: 400;
+}

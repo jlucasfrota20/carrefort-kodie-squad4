@@ -18,6 +18,13 @@ const emptyLot = {
   expiration_date: "",
 };
 
+const emptyMovement = {
+  lot_id: "",
+  movement_type: "VENDIDO",
+  quantity: "",
+  notes: "",
+};
+
 const emptyFilters = {
   category: "",
   movement: "",
@@ -87,6 +94,7 @@ function GerenciamentoProdutos({ initialTab = "stock", showTabs = true }) {
 
   const [productForm, setProductForm] = useState(emptyProduct);
   const [lotForm, setLotForm] = useState(emptyLot);
+  const [movementForm, setMovementForm] = useState(emptyMovement);
 
   const [lotSearch, setLotSearch] = useState("");
   const [showFilters, setShowFilters] = useState(false);
@@ -325,6 +333,14 @@ function GerenciamentoProdutos({ initialTab = "stock", showTabs = true }) {
     setModal("register");
   }
 
+  // Abre o formulário de movimentação
+  function openMovementModal() {
+    setMovementForm({ ...emptyMovement });
+    setModalMessage("");
+    setFeedback("");
+    setModal("movement");
+  }
+
   // Escolhe o tipo de cadastro
   function chooseRegistration(type) {
     setRegisterStep(type);
@@ -374,6 +390,7 @@ function GerenciamentoProdutos({ initialTab = "stock", showTabs = true }) {
     setEditingLot(null);
     setProductForm({ ...emptyProduct });
     setLotForm({ ...emptyLot });
+    setMovementForm({ ...emptyMovement });
     setLotSearch("");
     setModalMessage("");
   }
@@ -400,6 +417,10 @@ function GerenciamentoProdutos({ initialTab = "stock", showTabs = true }) {
     ) {
       setLotForm({ ...emptyLot });
       setLotSearch("");
+    }
+
+    if (modal === "movement") {
+      setMovementForm({ ...emptyMovement });
     }
 
     setModalMessage("");
@@ -437,6 +458,16 @@ function GerenciamentoProdutos({ initialTab = "stock", showTabs = true }) {
     });
   }
 
+  function handleMovementChange(event) {
+    const { name, value } = event.target;
+
+    setMovementForm((prev) => ({
+      ...prev,
+      [name]: value,
+      ...(name === "lot_id" ? { quantity: "" } : {}),
+    }));
+  }
+
   // Produtos encontrados na busca do lote
   const lotProductResults = products.filter((product) => {
     const query = lotSearch.trim().toLowerCase();
@@ -459,6 +490,10 @@ function GerenciamentoProdutos({ initialTab = "stock", showTabs = true }) {
 
   const selectedProduct = products.find(
     (product) => product.id === lotForm.product_id
+  );
+
+  const selectedMovementLot = lotsWithInfo.find(
+    (lot) => lot.id === movementForm.lot_id
   );
 
   // Mantem a unidade do produto consistente entre todos os lotes.
@@ -656,6 +691,89 @@ function GerenciamentoProdutos({ initialTab = "stock", showTabs = true }) {
     setSaving(false);
   }
 
+  // Registra vendido, doado ou descartado
+  async function handleMovementSubmit(event) {
+    event.preventDefault();
+
+    setSaving(true);
+    setModalMessage("");
+
+    const lot = lotsWithInfo.find(
+      (item) => item.id === movementForm.lot_id
+    );
+
+    const quantity = Number(movementForm.quantity);
+    const movementType = movementForm.movement_type;
+
+    if (!lot) {
+      setModalMessage("Selecione um lote válido.");
+      setSaving(false);
+      return;
+    }
+
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+      setModalMessage("Informe uma quantidade válida.");
+      setSaving(false);
+      return;
+    }
+
+    if (!["VENDIDO", "DOADO", "DESCARTADO"].includes(movementType)) {
+      setModalMessage("Selecione um tipo de movimentação válido.");
+      setSaving(false);
+      return;
+    }
+
+    if (lot.product?.unit === "UN" && !Number.isInteger(quantity)) {
+      setModalMessage(
+        "A quantidade deve ser um número inteiro para produtos por unidade."
+      );
+      setSaving(false);
+      return;
+    }
+
+    if (quantity > lot.available) {
+      setModalMessage(
+        `A quantidade não pode ser maior que o saldo disponível (${formatQuantity(
+          lot.available,
+          lot.product?.unit
+        )}).`
+      );
+      setSaving(false);
+      return;
+    }
+
+    // Lotes vencidos só podem ser descartados.
+    if (lot.validity === "expired" && movementType !== "DESCARTADO") {
+      setModalMessage(
+        "Este lote está vencido. Somente é permitido registrar o descarte."
+      );
+      setSaving(false);
+      return;
+    }
+
+    const { error } = await supabase
+      .from("stock_movements")
+      .insert({
+        lot_id: lot.id,
+        movement_type: movementType,
+        quantity,
+        notes: movementForm.notes.trim() || null,
+      });
+
+    if (error) {
+      console.error("Erro ao registrar movimentação:", error);
+      setModalMessage("Não foi possível registrar a movimentação.");
+      setSaving(false);
+      return;
+    }
+
+    closeModal();
+    await loadData();
+
+    setFeedback("Movimentação registrada com sucesso!");
+    setSaving(false);
+  }
+
   const showProductForm =
     modal === "product" ||
     (modal === "register" && registerStep === "product");
@@ -692,9 +810,15 @@ function GerenciamentoProdutos({ initialTab = "stock", showTabs = true }) {
         <button
           type="button"
           className="button-primary register-button"
-          onClick={openRegister}
+          onClick={
+            activeTab === "movements"
+              ? openMovementModal
+              : openRegister
+          }
         >
-          + Registrar
+          {activeTab === "movements"
+            ? "+ Registrar movimentação"
+            : "+ Registrar"}
         </button>
       </header>
 
@@ -1246,6 +1370,153 @@ function GerenciamentoProdutos({ initialTab = "stock", showTabs = true }) {
                     : editingProduct
                     ? "Salvar alterações"
                     : "Cadastrar"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Registro de movimentação */}
+      {modal === "movement" && (
+        <div
+          className="modal-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closeModal();
+          }}
+        >
+          <div className="modal form-modal">
+            <div className="modal-header">
+              <div>
+                <h2>Registrar movimentação</h2>
+                <p>Registre uma venda, doação ou descarte de um lote.</p>
+              </div>
+
+              <button
+                type="button"
+                className="modal-close"
+                onClick={closeModal}
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={handleMovementSubmit}>
+              <div className="form-grid">
+                <label>
+                  Tipo de movimentação
+                  <select
+                    name="movement_type"
+                    value={movementForm.movement_type}
+                    onChange={handleMovementChange}
+                    required
+                  >
+                    <option value="VENDIDO">Vendido</option>
+                    <option value="DOADO">Doado</option>
+                    <option value="DESCARTADO">Descartado</option>
+                  </select>
+                </label>
+
+                <label>
+                  Lote
+                  <select
+                    name="lot_id"
+                    value={movementForm.lot_id}
+                    onChange={handleMovementChange}
+                    required
+                  >
+                    <option value="">Selecione um lote</option>
+
+                    {lotsWithInfo
+                      .filter((lot) => lot.available > 0)
+                      .map((lot) => (
+                        <option key={lot.id} value={lot.id}>
+                          {lot.product?.name || "Produto"} ·{" "}
+                          {lot.lot_code || "Sem código"} ·{" "}
+                          {formatQuantity(lot.available, lot.product?.unit)}
+                          {lot.validity === "expired"
+                            ? " · VENCIDO (somente descarte)"
+                            : ""}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+
+                <label className="quantity-unit-label">
+                  Quantidade
+
+                  <div className="quantity-unit-control">
+                    <input
+                      type="number"
+                      name="quantity"
+                      min={selectedMovementLot?.product?.unit === "UN" ? "1" : "0.001"}
+                      max={selectedMovementLot?.available ?? undefined}
+                      step={selectedMovementLot?.product?.unit === "UN" ? "1" : "0.001"}
+                      value={movementForm.quantity}
+                      onChange={handleMovementChange}
+                      disabled={!selectedMovementLot}
+                      required
+                    />
+
+                    <select
+                      value={selectedMovementLot?.product?.unit || "UN"}
+                      disabled
+                      aria-label="Unidade de medida"
+                    >
+                      <option value="UN">Unidade</option>
+                      <option value="KG">KG</option>
+                      <option value="L">L</option>
+                    </select>
+                  </div>
+
+                  {selectedMovementLot && (
+                    <small className="form-hint">
+                      Disponível:{" "}
+                      {formatQuantity(
+                        selectedMovementLot.available,
+                        selectedMovementLot.product?.unit
+                      )}
+                    </small>
+                  )}
+                </label>
+
+                <label>
+                  Observação (opcional)
+                  <textarea
+                    name="notes"
+                    rows="3"
+                    value={movementForm.notes}
+                    onChange={handleMovementChange}
+                    placeholder="Adicione uma observação..."
+                  />
+                </label>
+              </div>
+
+              {selectedMovementLot?.validity === "expired" && (
+                <p className="form-hint">
+                  Este lote está vencido. Só é permitido registrar o descarte.
+                </p>
+              )}
+
+              {modalMessage && (
+                <p className="modal-message">{modalMessage}</p>
+              )}
+
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="button-secondary"
+                  onClick={closeModal}
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  type="submit"
+                  className="button-primary"
+                  disabled={saving || !selectedMovementLot}
+                >
+                  {saving ? "Registrando..." : "Registrar movimentação"}
                 </button>
               </div>
             </form>
