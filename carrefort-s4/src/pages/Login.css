@@ -1,0 +1,571 @@
+
+/* ========================================
+   CONFIGURAÇÕES GERAIS
+======================================== */
+
+.login-page {
+  --login-primary: #23533A;
+  --login-primary-hover: #1B412D;
+  --login-primary-soft: #E8F0EB;
+  --login-text: #222624;
+  --login-muted: #6C7570;
+  --login-border: #E2E5E1;
+  --login-placeholder: #9CA3AF;
+
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  padding: 2.5rem 1.5rem;
+
+  background-color: #F7F7F2;
+  color: var(--login-text);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+  box-sizing: border-box;
+}
+
+.login-page *,
+.login-page *::before,
+.login-page *::after {
+  box-sizing: border-box;
+}
+
+/* ========================================
+   ESTRUTURA PRINCIPAL
+======================================== */
+
+.login-page .login-wrapper {
+  width: 100%;
+  max-width: 65rem;
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 27.5rem);
+  gap: 4rem;
+
+  align-items: center;
+  justify-content: center;
+}
+
+/* ========================================
+   MARCA CARREFORT
+======================================== */
+
+.login-page .brand-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.login-page .brand-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+
+  padding: 0;
+  margin: 0;
+
+  background: transparent !important;
+  border: none;
+  box-shadow: none;
+
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #23533A;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.login-page .brand-logo-icon {
+  width: 2.625rem;
+  height: 2.625rem;
+  min-width: 2.625rem;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #23533A !important;
+  color: #FFFFFF;
+  border-radius: 0.75rem;
+
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+}
+
+.login-page .brand-logo-icon svg {
+  display: block;
+  width: 1.375rem;
+  height: 1.375rem;
+  color: #FFFFFF;
+  flex-shrink: 0;
+}
+
+.login-page .brand-logo span {
+  display: inline-block;
+  background: transparent !important;
+  color: #23533A;
+  padding: 0;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* ========================================
+   TEXTO INSTITUCIONAL
+======================================== */
+
+.login-page .brand-headline {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.18;
+  color: var(--login-text);
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+
+.login-page .brand-headline span {
+  color: var(--login-primary);
+}
+
+.login-page .brand-description {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--login-muted);
+  max-width: 27.5rem;
+  margin: 0;
+}
+
+.login-page .brand-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  background-color: var(--login-primary-soft);
+  color: var(--login-primary);
+
+  font-size: 0.8125rem;
+  font-weight: 600;
+
+  padding: 0.625rem 1rem;
+  border-radius: 999px;
+  margin-top: 0.5rem;
+}
+
+.login-page .brand-pill svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+/* ========================================
+   CARD DE LOGIN
+======================================== */
+
+.login-page .login-card {
+  width: 100%;
+  max-width: 27.5rem;
+  margin: 0 auto;
+
+  background-color: #FFFFFF;
+  border-radius: 1.5rem;
+  padding: 2.5rem 2.25rem;
+
+  box-shadow: 0 0.75rem 2rem rgba(34, 38, 36, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+/* ========================================
+   BOTÃO VOLTAR PARA OFERTAS
+======================================== */
+
+.login-page .btn-back-offers {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4375rem;
+
+  margin-bottom: 1.75rem;
+
+  color: var(--login-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.login-page .btn-back-offers:hover {
+  color: var(--login-primary);
+}
+
+.login-page .btn-back-offers svg {
+  width: 1.0625rem;
+  height: 1.0625rem;
+  flex-shrink: 0;
+}
+
+/* ========================================
+   ÍCONE DE SEGURANÇA
+======================================== */
+
+.login-page .lock-badge {
+  width: 3rem;
+  height: 3rem;
+
+  border-radius: 0.875rem;
+  background-color: var(--login-primary-soft);
+  color: var(--login-primary);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 1.5rem;
+}
+
+.login-page .lock-badge svg {
+  width: 1.375rem;
+  height: 1.375rem;
+}
+
+/* ========================================
+   TÍTULOS DO CARD
+======================================== */
+
+.login-page .card-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--login-text);
+  letter-spacing: -0.02em;
+  margin: 0 0 0.375rem;
+}
+
+.login-page .card-subtitle {
+  font-size: 0.875rem;
+  color: var(--login-muted);
+  margin: 0 0 1.75rem;
+}
+
+/* ========================================
+   FORMULÁRIO
+======================================== */
+
+.login-page .form-group {
+  margin-bottom: 1.25rem;
+}
+
+.login-page .form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--login-text);
+  margin-bottom: 0.5rem;
+}
+
+.login-page .input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.login-page .input-icon {
+  position: absolute;
+  left: 0.875rem;
+
+  color: var(--login-placeholder);
+
+  display: flex;
+  align-items: center;
+
+  pointer-events: none;
+}
+
+.login-page .input-icon svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.login-page .form-input {
+  width: 100%;
+  min-width: 0;
+  height: 3rem;
+
+  padding: 0 1rem 0 2.625rem;
+
+  border: 1px solid var(--login-border);
+  border-radius: 0.75rem;
+
+  font-size: 0.875rem;
+  color: var(--login-text);
+  background-color: #FFFFFF;
+
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.login-page .form-input::placeholder {
+  color: var(--login-placeholder);
+}
+
+.login-page .form-input:focus {
+  outline: none;
+  border-color: var(--login-primary);
+  box-shadow: 0 0 0 0.1875rem rgba(35, 83, 58, 0.12);
+}
+
+/* ========================================
+   MENSAGEM DE ERRO
+======================================== */
+
+.login-page .login-error {
+  margin: 0 0 0.875rem;
+  color: #B42318;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+/* ========================================
+   BOTÃO ENTRAR
+======================================== */
+
+.login-page .btn-submit {
+  width: 100%;
+  min-height: 3.125rem;
+
+  margin-top: 0.5rem;
+  padding: 0.75rem 1rem;
+
+  background-color: var(--login-primary);
+  color: #FFFFFF;
+
+  border: none;
+  border-radius: 0.75rem;
+
+  font-size: 0.9375rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.login-page .btn-submit:hover {
+  background-color: var(--login-primary-hover);
+}
+
+.login-page .btn-submit:active {
+  transform: scale(0.99);
+}
+
+.login-page .btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.login-page .btn-submit svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+/* ========================================
+   AVISO PARA FUNCIONÁRIOS
+======================================== */
+
+.login-page .employee-notice {
+  margin-top: 1.25rem;
+
+  background-color: var(--login-primary-soft);
+  color: var(--login-primary);
+
+  border-radius: 0.75rem;
+  padding: 0.8125rem 1rem;
+
+  font-size: 0.8125rem;
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  text-align: center;
+}
+
+.login-page .employee-notice svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+/* ========================================
+   TABLETS
+======================================== */
+
+@media (max-width: 53.75rem) {
+  .login-page .brand-logo {
+  justify-content: center;
+  align-self: center;
+  } 
+
+  .login-page .login-wrapper {
+    grid-template-columns: 1fr;
+    max-width: 27.5rem;
+    gap: 2rem;
+  }
+
+  .login-page .brand-section {
+    align-items: center;
+    text-align: center;
+    gap: 1.125rem;
+  }
+
+  .login-page .brand-headline {
+    font-size: 2rem;
+  }
+
+  .login-page .brand-description {
+    max-width: 100%;
+    font-size: 1rem;
+  }
+
+  .login-page .brand-pill {
+    justify-content: center;
+    margin-top: 0;
+  }
+
+  .login-page .login-card {
+    width: 100%;
+    max-width: 27.5rem;
+  }
+}
+
+/* ========================================
+   CELULARES
+======================================== */
+
+@media (max-width: 37.5rem) {
+  .login-page {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 1.75rem 1.125rem;
+    align-items: flex-start;
+  }
+
+  .login-page .login-wrapper {
+    max-width: 26.25rem;
+    gap: 1.5rem;
+  }
+
+  .login-page .brand-section {
+    gap: 0.875rem;
+  }
+
+  .login-page .brand-logo {
+    font-size: 1.375rem;
+    gap: 0.625rem;
+  }
+
+  .login-page .brand-logo-icon {
+    width: 2.375rem;
+    height: 2.375rem;
+    min-width: 2.375rem;
+    border-radius: 0.6875rem;
+  }
+
+  .login-page .brand-logo-icon svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .login-page .brand-headline {
+    font-size: 1.6875rem;
+    line-height: 1.2;
+  }
+
+  .login-page .brand-description {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .login-page .brand-pill {
+    font-size: 0.6875rem;
+    padding: 0.5625rem 0.75rem;
+    gap: 0.375rem;
+  }
+
+  .login-page .login-card {
+    padding: 1.75rem 1.375rem;
+    border-radius: 1.25rem;
+  }
+
+  .login-page .btn-back-offers {
+    margin-bottom: 1.375rem;
+  }
+
+  .login-page .card-title {
+    font-size: 1.5625rem;
+  }
+
+  .login-page .card-subtitle {
+    margin-bottom: 1.5rem;
+  }
+
+  .login-page .employee-notice {
+    font-size: 0.6875rem;
+    padding: 0.75rem 0.625rem;
+  }
+}
+
+/* ========================================
+   CELULARES PEQUENOS
+======================================== */
+
+@media (max-width: 22.5rem) {
+  .login-page {
+    padding: 1.375rem 0.75rem;
+  }
+
+  .login-page .login-wrapper {
+    gap: 1.25rem;
+  }
+
+  .login-page .brand-headline {
+    font-size: 1.5rem;
+  }
+
+  .login-page .brand-pill {
+    font-size: 0.625rem;
+  }
+
+  .login-page .login-card {
+    padding: 1.5rem 1.125rem;
+  }
+
+  .login-page .card-title {
+    font-size: 1.375rem;
+  }
+}
+
+/* ========================================
+   TELAS COM POUCA ALTURA
+======================================== */
+
+@media (max-height: 40rem) and (min-width: 53.75rem) {
+  .login-page {
+    align-items: flex-start;
+  }
+}

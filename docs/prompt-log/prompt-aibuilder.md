@@ -24,3 +24,38 @@ Registro dos marcos de desenvolvimento realizados em conjunto, com programação
 - Primeira versão funcional do módulo de estoque.
 - Código versionado com o commit `feat: modulo de estoque v1.0.0`.
 - Tag Git criada: `v1.0.0`.
+
+## Marco 2 — Painel Administrativo v1.1.0
+
+**Objetivo:** ampliar o sistema com um painel administrativo para facilitar o acompanhamento do estoque e das validades.
+
+### Desenvolvimento em conjunto
+
+- Criação do painel com indicadores de estoque e produtos.
+- Implementação dos alertas de validade: vencidos, vencem hoje, em até 2 dias e em até 5 dias.
+- Exibição das ofertas ativas e das movimentações recentes.
+- Implementação dos indicadores de produtos vendidos, doados, descartados e recuperados.
+- Organização da navegação lateral e das telas administrativas.
+- Ajustes visuais e correções durante o desenvolvimento.
+
+### Entrega
+
+- Painel administrativo integrado ao Supabase.
+- Código versionado com o commit da versão `v1.1.0`.
+
+## Marco 3 — Gestão de Ofertas e Vitrine Pública
+
+**Objetivo:** permitir a divulgação de produtos próximos do vencimento para incentivar seu aproveitamento.
+
+### Desenvolvimento em conjunto
+
+- Implementação do gerenciamento de ofertas.
+- Criação da vitrine pública de ofertas de última hora.
+- Integração das ofertas com os lotes cadastrados.
+- Exibição dos produtos disponíveis e suas respectivas validades.
+- Ajustes de responsividade e interface.
+
+### Entrega
+
+- Vitrine pública integrada aos dados do Supabase.
+- Funcionalidades do MVP implementadas e integradas.
