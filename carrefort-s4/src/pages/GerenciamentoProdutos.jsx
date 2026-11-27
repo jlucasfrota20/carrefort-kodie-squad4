@@ -75,7 +75,11 @@ function formatQuantity(value, unit) {
   })} ${unit || "UN"}`;
 }
 
-function GerenciamentoProdutos({ initialTab = "stock", showTabs = true }) {
+function GerenciamentoProdutos({
+  initialTab = "stock",
+  showTabs = true,
+  onMenuClick,
+}) {
   const [activeTab, setActiveTab] = useState(initialTab);
 
   const [categories, setCategories] = useState([]);
@@ -802,9 +806,30 @@ function GerenciamentoProdutos({ initialTab = "stock", showTabs = true }) {
   return (
     <div className="inventory-page">
       <header className="inventory-header">
-        <div>
-          <h1>{currentPage.title}</h1>
-          <p>{currentPage.description}</p>
+        <div className="inventory-heading">
+          <button
+            type="button"
+            className="inventory-menu-button"
+            onClick={onMenuClick}
+            aria-label="Abrir menu de navegação"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
+          <div>
+            <h1>{currentPage.title}</h1>
+            <p>{currentPage.description}</p>
+          </div>
         </div>
 
         <button
@@ -976,18 +1001,32 @@ function GerenciamentoProdutos({ initialTab = "stock", showTabs = true }) {
       ) : (
         <>
           {activeTab === "stock" && (
-            <div className="table-container">
-              <h2>Estoque por lote</h2>
+            <section className="table-container stock-table-card">
+              <div className="table-section-heading">
+                <div>
+                  <h2>Estoque por lote</h2>
+                  <p>Consulte saldos, saídas registradas e prazos de validade.</p>
+                </div>
+                <span className="table-count">
+                  {filteredLots.length} {filteredLots.length === 1 ? "lote" : "lotes"}
+                </span>
+              </div>
 
-              <table>
+              <table className="inventory-table stock-table">
+                <colgroup>
+                  <col className="stock-col-product" />
+                  <col className="stock-col-received" />
+                  <col className="stock-col-outflows" />
+                  <col className="stock-col-available" />
+                  <col className="stock-col-expiration" />
+                  <col className="stock-col-status" />
+                  <col className="stock-col-actions" />
+                </colgroup>
                 <thead>
                   <tr>
-                    <th>Produto</th>
-                    <th>Lote</th>
+                    <th>Produto / lote</th>
                     <th>Recebido</th>
-                    <th>Vendido</th>
-                    <th>Doado</th>
-                    <th>Descartado</th>
+                    <th>Destinação</th>
                     <th>Disponível</th>
                     <th>Validade</th>
                     <th>Situação</th>
@@ -998,40 +1037,45 @@ function GerenciamentoProdutos({ initialTab = "stock", showTabs = true }) {
                 <tbody>
                   {filteredLots.map((lot) => (
                     <tr key={lot.id}>
-                      <td>{lot.product?.name || "-"}</td>
-                      <td>{lot.lot_code || "-"}</td>
-                      <td>
-                        {formatQuantity(
-                          lot.quantity_received,
-                          lot.product?.unit
-                        )}
+                      <td data-label="Produto / lote">
+                        <div className="stock-product-cell">
+                          <strong title={lot.product?.name || "Produto não identificado"}>
+                            {lot.product?.name || "-"}
+                          </strong>
+                          <span>Lote: {lot.lot_code || "Sem código"}</span>
+                        </div>
                       </td>
-                      <td>{formatQuantity(lot.sold, lot.product?.unit)}</td>
-                      <td>{formatQuantity(lot.donated, lot.product?.unit)}</td>
-                      <td>
-                        {formatQuantity(lot.discarded, lot.product?.unit)}
-                      </td>
-                      <td>
-                        {formatQuantity(lot.available, lot.product?.unit)}
-                      </td>
-                      <td>{formatDate(lot.expiration_date)}</td>
-                      <td>
-                        <span className={`status status-${lot.validity}`}>
-                          {validityLabels[lot.validity]}
-                        </span>
-                        <span
-                          className={`status ${
-                            lot.available > 0
-                              ? "status-available"
-                              : "status-empty"
-                          }`}
-                        >
-                          {lot.available > 0
-                            ? "Disponível"
-                            : "Fora de estoque"}
+                      <td data-label="Recebido">
+                        <span className="quantity-value">
+                          {formatQuantity(lot.quantity_received, lot.product?.unit)}
                         </span>
                       </td>
-                      <td>
+                      <td data-label="Destinação">
+                        <div className="stock-outflows">
+                          <span><small>Vendido</small><strong>{formatQuantity(lot.sold, lot.product?.unit)}</strong></span>
+                          <span><small>Doado</small><strong>{formatQuantity(lot.donated, lot.product?.unit)}</strong></span>
+                          <span><small>Descartado</small><strong>{formatQuantity(lot.discarded, lot.product?.unit)}</strong></span>
+                        </div>
+                      </td>
+                      <td data-label="Disponível">
+                        <strong className="available-quantity">
+                          {formatQuantity(lot.available, lot.product?.unit)}
+                        </strong>
+                      </td>
+                      <td data-label="Validade">
+                        <span className="expiration-date">{formatDate(lot.expiration_date)}</span>
+                      </td>
+                      <td data-label="Situação">
+                        <div className="stock-status-cell">
+                          <span className={`status status-${lot.validity}`}>
+                            {validityLabels[lot.validity]}
+                          </span>
+                          <span className={`status ${lot.available > 0 ? "status-available" : "status-empty"}`}>
+                            {lot.available > 0 ? "Disponível" : "Fora de estoque"}
+                          </span>
+                        </div>
+                      </td>
+                      <td data-label="Ações" className="stock-actions-cell">
                         <button
                           type="button"
                           className="table-action"
@@ -1048,14 +1092,14 @@ function GerenciamentoProdutos({ initialTab = "stock", showTabs = true }) {
               {filteredLots.length === 0 && (
                 <p className="empty-state">Nenhum lote encontrado.</p>
               )}
-            </div>
+            </section>
           )}
 
           {activeTab === "products" && (
             <div className="table-container">
               <h2>Produtos cadastrados</h2>
 
-              <table>
+              <table className="inventory-table products-table">
                 <thead>
                   <tr>
                     <th>Nome</th>
@@ -1070,12 +1114,12 @@ function GerenciamentoProdutos({ initialTab = "stock", showTabs = true }) {
                 <tbody>
                   {filteredProducts.map((product) => (
                     <tr key={product.id}>
-                      <td>{product.name}</td>
-                      <td>{getCategoryName(product.category_id)}</td>
-                      <td>{product.brand || "-"}</td>
-                      <td>{product.barcode || "-"}</td>
-                      <td>{product.unit}</td>
-                      <td>
+                      <td data-label="Nome"><strong className="product-name-cell">{product.name}</strong></td>
+                      <td data-label="Categoria">{getCategoryName(product.category_id)}</td>
+                      <td data-label="Marca">{product.brand || "-"}</td>
+                      <td data-label="Código de barras" className="breakable-cell">{product.barcode || "-"}</td>
+                      <td data-label="Unidade">{product.unit}</td>
+                      <td data-label="Ações">
                         <button
                           type="button"
                           className="table-action"
@@ -1096,16 +1140,28 @@ function GerenciamentoProdutos({ initialTab = "stock", showTabs = true }) {
           )}
 
           {activeTab === "movements" && (
-            <div className="table-container">
-              <h2>Movimentações</h2>
+            <section className="table-container movements-card">
+              <div className="table-section-heading">
+                <div>
+                  <h2>Histórico de movimentações</h2>
+                  <p>
+                    Acompanhe todas as vendas, doações e descartes registrados no estoque.
+                  </p>
+                </div>
 
-              <table>
+                <span className="table-count">
+                  {filteredMovements.length}{" "}
+                  {filteredMovements.length === 1 ? "registro" : "registros"}
+                </span>
+              </div>
+
+              <table className="inventory-table movements-table">
                 <thead>
                   <tr>
-                    <th>Data</th>
+                    <th>Data e hora</th>
                     <th>Produto</th>
                     <th>Lote</th>
-                    <th>Tipo</th>
+                    <th>Destinação</th>
                     <th>Quantidade</th>
                     <th>Observação</th>
                   </tr>
@@ -1121,24 +1177,55 @@ function GerenciamentoProdutos({ initialTab = "stock", showTabs = true }) {
                       (item) => item.id === lot?.product_id
                     );
 
+                    const movementDate = new Date(movement.created_at);
+
                     return (
                       <tr key={movement.id}>
-                        <td>
-                          {new Date(movement.created_at).toLocaleString("pt-BR")}
+                        <td data-label="Data e hora">
+                          <div className="movement-date-cell">
+                            <strong>
+                              {movementDate.toLocaleDateString("pt-BR")}
+                            </strong>
+                            <span>
+                              {movementDate.toLocaleTimeString("pt-BR", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </span>
+                          </div>
                         </td>
-                        <td>{product?.name || "-"}</td>
-                        <td>{lot?.lot_code || "-"}</td>
-                        <td>
+
+                        <td data-label="Produto">
+                          <div className="movement-product-cell">
+                            <strong>{product?.name || "Produto não identificado"}</strong>
+                            <span>{product?.brand || "Sem marca informada"}</span>
+                          </div>
+                        </td>
+
+                        <td data-label="Lote">
+                          <span className="movement-lot">
+                            {lot?.lot_code || "Sem código"}
+                          </span>
+                        </td>
+
+                        <td data-label="Destinação">
                           <span
                             className={`status status-${movement.movement_type.toLowerCase()}`}
                           >
-                            {movementLabels[movement.movement_type]}
+                            {movementLabels[movement.movement_type] ||
+                              movement.movement_type}
                           </span>
                         </td>
-                        <td>
-                          {formatQuantity(movement.quantity, product?.unit)}
+
+                        <td data-label="Quantidade">
+                          <strong className="movement-quantity">
+                            {formatQuantity(movement.quantity, product?.unit)}
+                          </strong>
                         </td>
-                        <td>{movement.notes || "-"}</td>
+
+                        <td data-label="Observação" className="movement-notes-cell">
+                          {movement.notes || "Sem observação"}
+                        </td>
                       </tr>
                     );
                   })}
@@ -1147,12 +1234,13 @@ function GerenciamentoProdutos({ initialTab = "stock", showTabs = true }) {
 
               {filteredMovements.length === 0 && (
                 <p className="empty-state">
-                  Nenhuma movimentação encontrada.
+                  Nenhuma movimentação encontrada. Os registros aparecerão aqui
+                  quando uma venda, doação ou descarte for realizado.
                 </p>
               )}
-            </div>
-          )}
-        </>
+            </section>
+          )}            
+          </>
       )}
 
       {/* Central de registro */}

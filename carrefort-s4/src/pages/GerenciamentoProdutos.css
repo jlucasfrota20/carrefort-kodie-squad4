@@ -711,3 +711,1138 @@
 .movement-form .modal-actions {
   margin-top: 4px;
 }
+
+/* =========================================
+   CARREFORT — VISUAL DO ESTOQUE
+   Inspirado no layout de estoque.html
+   ========================================= */
+
+.inventory-page {
+  width: 100%;
+  max-width: 1500px;
+  min-width: 0;
+  margin: 0 auto;
+  padding: 8px 0 32px;
+  color: #222624;
+}
+
+.inventory-header {
+  align-items: flex-start;
+  margin-bottom: 26px;
+}
+
+.inventory-header h1 {
+  color: #222624;
+  font-size: clamp(24px, 2.2vw, 29px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.inventory-header p {
+  color: #6c7570;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.inventory-page .button-primary {
+  border: 1px solid #23533a;
+  border-radius: 12px;
+  background: #23533a;
+  color: #fff;
+  font-weight: 600;
+  transition: background .2s, transform .2s, box-shadow .2s;
+}
+
+.inventory-page .button-primary:hover:not(:disabled) {
+  background: #1b412d;
+  box-shadow: 0 4px 12px rgba(35, 83, 58, .16);
+}
+
+.inventory-page .button-secondary {
+  border: 1px solid #e1e5df;
+  border-radius: 11px;
+  background: #fff;
+  color: #3f4943;
+}
+
+.inventory-page .button-secondary:hover {
+  border-color: #b8c8bc;
+  background: #f8faf7;
+}
+
+.inventory-stats {
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  min-width: 0;
+  padding: 18px 20px;
+  border: 1px solid #e6e8e4;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(48, 59, 51, .04);
+}
+
+.stat-card span {
+  color: #6c7570;
+  font-size: 13px;
+}
+
+.stat-card strong {
+  color: #23533a;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.inventory-toolbar {
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.inventory-page .inventory-toolbar input {
+  min-width: 0;
+  height: 46px;
+  padding: 0 15px;
+  border: 1px solid #e2e6e0;
+  border-radius: 12px;
+  background: #fff;
+  color: #222624;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .02);
+}
+
+.inventory-page .inventory-toolbar input:focus,
+.inventory-page input:focus,
+.inventory-page select:focus {
+  outline: none;
+  border-color: #78a982;
+  box-shadow: 0 0 0 3px rgba(120, 169, 130, .14);
+}
+
+.inventory-toolbar .button-secondary {
+  min-height: 46px;
+  padding: 0 18px;
+  white-space: nowrap;
+}
+
+.filter-panel {
+  gap: 14px;
+  padding: 18px;
+  margin-bottom: 18px;
+  border: 1px solid #e6e8e4;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(48, 59, 51, .03);
+}
+
+.filter-panel label {
+  flex: 1 1 170px;
+  min-width: 0;
+  color: #4f5b53;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.inventory-page .filter-panel select {
+  min-width: 0;
+  height: 42px;
+  border-color: #e2e6e0;
+  border-radius: 10px;
+  color: #303b33;
+  font-size: 13px;
+}
+
+.filter-panel .button-text {
+  color: #23533a;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.table-container {
+  width: 100%;
+  min-width: 0;
+  overflow: visible;
+  padding: 22px;
+  border: 1px solid #e6e8e4;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(48, 59, 51, .035);
+}
+
+.table-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.table-section-heading h2,
+.table-container > h2 {
+  margin: 0;
+  color: #303b33;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.table-section-heading p {
+  margin: 5px 0 0;
+  color: #6c7570;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.table-count {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #e8f0eb;
+  color: #23533a;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.inventory-table {
+  width: 100%;
+  min-width: 0 !important;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: left;
+}
+
+.inventory-table thead {
+  background: #fafbf9;
+}
+
+.inventory-table th {
+  padding: 13px 10px;
+  border-top: 1px solid #edf0eb;
+  border-bottom: 1px solid #e6e8e4;
+  color: #6c7570;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+  white-space: normal;
+  line-height: 1.35;
+}
+
+.inventory-table th:first-child {
+  border-top-left-radius: 9px;
+}
+
+.inventory-table th:last-child {
+  border-top-right-radius: 9px;
+}
+
+.inventory-table td {
+  min-width: 0;
+  padding: 14px 10px;
+  border-bottom: 1px solid #f0f2ee;
+  color: #303b33;
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  vertical-align: middle;
+}
+
+.inventory-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.inventory-table tbody tr:hover {
+  background: #fbfcfa;
+}
+
+.stock-col-product { width: 20%; }
+.stock-col-received { width: 11%; }
+.stock-col-outflows { width: 19%; }
+.stock-col-available { width: 12%; }
+.stock-col-expiration { width: 11%; }
+.stock-col-status { width: 17%; }
+.stock-col-actions { width: 10%; }
+
+.stock-product-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.stock-product-cell strong {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #27332b;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.stock-product-cell span {
+  color: #7a857d;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+
+.quantity-value,
+.expiration-date {
+  color: #4e5a52;
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.available-quantity {
+  color: #23533a;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.stock-outflows {
+  display: grid;
+  gap: 4px;
+}
+
+.stock-outflows > span {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 5px;
+  min-width: 0;
+}
+
+.stock-outflows small {
+  color: #778179;
+  font-size: 9px;
+}
+
+.stock-outflows strong {
+  color: #4c5850;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.stock-status-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+.inventory-page .status {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  padding: 5px 8px;
+  margin: 0;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: normal;
+}
+
+.inventory-page .status-available,
+.inventory-page .status-valid,
+.inventory-page .status-vendido {
+  color: #1e6f43;
+  background: #e6f4ea;
+}
+
+.inventory-page .status-empty {
+  color: #59635d;
+  background: #eef0ed;
+}
+
+.inventory-page .status-expired,
+.inventory-page .status-descartado {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.inventory-page .status-today,
+.inventory-page .status-twoDays,
+.inventory-page .status-fiveDays {
+  color: #9a6100;
+  background: #fef3c7;
+}
+
+.inventory-page .status-doado {
+  color: #2459a6;
+  background: #e8f0ff;
+}
+
+.table-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 58px;
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid #d9e4dc;
+  border-radius: 9px;
+  background: #f7faf7;
+  color: #23533a;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+}
+
+.table-action:hover {
+  border-color: #78a982;
+  background: #e8f0eb;
+}
+
+.products-table td,
+.movements-table td {
+  font-size: 12px;
+}
+
+.product-name-cell {
+  color: #27332b;
+  font-weight: 700;
+}
+
+.breakable-cell {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.feedback {
+  padding: 11px 14px;
+  border-radius: 10px;
+  background: #e6f4ea;
+  color: #1e6f43;
+}
+
+.feedback.error {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.empty-state {
+  padding: 24px 12px;
+  color: #78837b;
+  text-align: center;
+  font-size: 13px;
+}
+
+/* Ajustes dos modais para combinar com o painel */
+.inventory-page .modal {
+  border: 1px solid #e6e8e4;
+  border-radius: 18px;
+  box-shadow: 0 20px 50px rgba(25, 45, 32, .18);
+}
+
+.inventory-page .modal-header h2 {
+  color: #27332b;
+}
+
+.inventory-page .modal form label {
+  color: #46534a;
+  font-weight: 600;
+}
+
+.inventory-page .modal form input,
+.inventory-page .modal form select,
+.inventory-page .modal form textarea {
+  border-color: #e0e5df;
+  border-radius: 10px;
+}
+
+.inventory-page .register-option {
+  border-color: #e2e8e2;
+  border-radius: 14px;
+}
+
+.inventory-page .register-option:hover:not(:disabled) {
+  border-color: #78a982;
+  background: #f8fbf8;
+}
+
+.inventory-page .register-option-icon {
+  border-radius: 10px;
+  background: #e8f0eb;
+  color: #23533a;
+}
+
+/* Em telas médias, reduzimos espaçamentos e tipografia antes de empilhar. */
+@media (max-width: 1180px) {
+  .table-container {
+    padding: 18px;
+  }
+
+  .inventory-table th,
+  .inventory-table td {
+    padding-right: 7px;
+    padding-left: 7px;
+  }
+
+  .stock-col-product { width: 19%; }
+  .stock-col-received { width: 10%; }
+  .stock-col-outflows { width: 19%; }
+  .stock-col-available { width: 11%; }
+  .stock-col-expiration { width: 11%; }
+  .stock-col-status { width: 19%; }
+  .stock-col-actions { width: 11%; }
+}
+
+/* Tabelas viram cartões em telas estreitas: sem rolagem horizontal. */
+@media (max-width: 760px) {
+  .inventory-page {
+    padding: 4px 0 24px;
+  }
+
+  .inventory-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .table-container {
+    padding: 16px;
+  }
+
+  .inventory-table,
+  .inventory-table tbody,
+  .inventory-table tr,
+  .inventory-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .inventory-table thead {
+    display: none;
+  }
+
+  .inventory-table tbody {
+    display: grid;
+    gap: 12px;
+  }
+
+  .inventory-table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 12px;
+    padding: 8px 12px;
+    border: 1px solid #e9ede8;
+    border-radius: 13px;
+    background: #fff;
+  }
+
+  .inventory-table tbody tr:hover {
+    background: #fff;
+  }
+
+  .inventory-table td {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 5px;
+    min-width: 0;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f2ee;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+
+  .inventory-table td::before {
+    content: attr(data-label);
+    color: #849087;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .045em;
+    text-transform: uppercase;
+  }
+
+  .inventory-table td:last-child,
+  .inventory-table td:nth-last-child(2) {
+    border-bottom: none;
+  }
+
+  .stock-table .stock-outflows {
+    width: 100%;
+  }
+
+  .stock-table .stock-outflows > span {
+    justify-content: flex-start;
+    gap: 7px;
+  }
+
+  .stock-table .stock-outflows strong {
+    text-align: left;
+  }
+
+  .stock-table .stock-actions-cell {
+    grid-column: 1 / -1;
+    align-items: stretch;
+  }
+
+  .stock-table .stock-actions-cell .table-action {
+    width: 100%;
+    min-height: 38px;
+  }
+
+  .stock-table .stock-status-cell {
+    align-items: flex-start;
+  }
+
+  .products-table td:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .products-table td:last-child .table-action {
+    width: 100%;
+  }
+
+  .movements-table tbody tr {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .movements-table td:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .inventory-toolbar {
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 480px) {
+  .inventory-header {
+    gap: 14px;
+  }
+
+  .inventory-header h1 {
+    font-size: 23px;
+  }
+
+  .inventory-header .register-button {
+    width: 100%;
+  }
+
+  .inventory-stats {
+    gap: 9px;
+  }
+
+  .stat-card {
+    padding: 14px;
+  }
+
+  .stat-card strong {
+    font-size: 22px;
+  }
+
+  .table-container {
+    padding: 13px;
+  }
+
+  .table-section-heading {
+    align-items: flex-start;
+  }
+
+  .table-count {
+    font-size: 10px;
+  }
+
+  .inventory-table tbody tr {
+    padding: 7px 10px;
+    gap: 0 10px;
+  }
+}
+/* =========================================
+   CARREFORT — HISTÓRICO DE MOVIMENTAÇÕES
+   ========================================= */
+
+.movements-card {
+  overflow: hidden;
+}
+
+.movements-card .table-section-heading {
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.movements-card .table-section-heading h2 {
+  color: #303b33;
+  font-size: 18px;
+}
+
+.movements-card .table-section-heading p {
+  margin-top: 6px;
+  color: #78837b;
+  font-size: 12px;
+}
+
+.movements-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.movements-table th:nth-child(1) {
+  width: 14%;
+}
+
+.movements-table th:nth-child(2) {
+  width: 21%;
+}
+
+.movements-table th:nth-child(3) {
+  width: 13%;
+}
+
+.movements-table th:nth-child(4) {
+  width: 14%;
+}
+
+.movements-table th:nth-child(5) {
+  width: 15%;
+}
+
+.movements-table th:nth-child(6) {
+  width: 23%;
+}
+
+.movements-table td {
+  padding-top: 17px;
+  padding-bottom: 17px;
+  color: #4e5a52;
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+.movement-date-cell,
+.movement-product-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.movement-date-cell strong {
+  color: #303b33;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.movement-date-cell span {
+  color: #849087;
+  font-size: 11px;
+}
+
+.movement-product-cell strong {
+  overflow-wrap: anywhere;
+  color: #27332b;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.movement-product-cell span {
+  color: #849087;
+  font-size: 10px;
+}
+
+.movement-lot {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  color: #657168;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.movement-quantity {
+  color: #23533a;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.movements-table .status {
+  padding: 6px 10px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.movements-table .status-vendido {
+  color: #1e6f43;
+  background: #e6f4ea;
+}
+
+.movements-table .status-doado {
+  color: #2459a6;
+  background: #e8f0ff;
+}
+
+.movements-table .status-descartado {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.movement-notes-cell {
+  color: #78837b !important;
+  font-size: 11px !important;
+  line-height: 1.5 !important;
+  overflow-wrap: anywhere;
+}
+
+/* Ajuste para telas médias */
+@media (max-width: 1000px) {
+  .movements-table th,
+  .movements-table td {
+    padding-right: 7px;
+    padding-left: 7px;
+  }
+
+  .movements-table .status {
+    white-space: normal;
+  }
+}
+
+/* Movimentações em cartões no celular */
+@media (max-width: 760px) {
+  .movements-card {
+    padding: 16px;
+  }
+
+  .movements-card .table-section-heading {
+    align-items: flex-start;
+  }
+
+  .movements-table {
+    display: block;
+    width: 100%;
+  }
+
+  .movements-table tbody {
+    display: grid;
+    gap: 12px;
+  }
+
+  .movements-table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 14px;
+    padding: 10px 13px;
+    border: 1px solid #e9ede8;
+    border-radius: 13px;
+    background: #fff;
+  }
+
+  .movements-table tbody tr:hover {
+    background: #fff;
+  }
+
+  .movements-table td {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    min-width: 0;
+    padding: 11px 0;
+    border-bottom: 1px solid #f0f2ee;
+    font-size: 12px;
+  }
+
+  .movements-table td::before {
+    margin-bottom: 5px;
+    color: #849087;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .045em;
+    text-transform: uppercase;
+  }
+
+  .movements-table td:nth-child(2),
+  .movements-table td:nth-child(6) {
+    grid-column: 1 / -1;
+  }
+
+  .movements-table td:nth-child(5),
+  .movements-table td:nth-child(6) {
+    border-bottom: none;
+  }
+
+  .movements-table .status {
+    white-space: normal;
+  }
+
+  .movement-notes-cell {
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 480px) {
+  .movements-card {
+    padding: 13px;
+  }
+
+  .movements-card .table-section-heading {
+    gap: 8px;
+  }
+
+  .movements-card .table-section-heading h2 {
+    font-size: 16px;
+  }
+
+  .movements-table tbody tr {
+    padding: 8px 10px;
+    gap: 0 10px;
+  }
+
+  .movements-table td {
+    padding: 10px 0;
+  }
+}
+
+
+/* =========================================
+   CARREFORT — RESPONSIVIDADE E ACESSIBILIDADE
+   ========================================= */
+
+/* Botão para abrir a navegação lateral */
+.inventory-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  min-width: 0;
+}
+
+.inventory-heading > div {
+  min-width: 0;
+}
+
+.inventory-menu-button {
+  display: none;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.625rem;
+  height: 2.625rem;
+  padding: 0;
+  border: 0.0625rem solid #e1e5df;
+  border-radius: 0.6875rem;
+  background: #fff;
+  color: #23533a;
+  cursor: pointer;
+}
+
+.inventory-menu-button svg {
+  width: 1.3125rem;
+  height: 1.3125rem;
+}
+
+/* Telas intermediárias */
+@media (max-width: 73.75rem) {
+  .inventory-header {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .inventory-heading {
+    flex: 1 1 100%;
+  }
+
+  .inventory-header .register-button {
+    width: 100%;
+  }
+
+  .inventory-page {
+    min-width: 0;
+  }
+
+  .table-container {
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+
+/* Tablets e celulares */
+@media (max-width: 60rem) {
+  .inventory-menu-button {
+    display: inline-flex;
+  }
+
+  .inventory-header {
+    align-items: flex-start;
+  }
+
+  .inventory-heading {
+    flex: 1;
+  }
+}
+
+/* Tabelas em formato de cartões */
+@media (max-width: 47.5rem) {
+  .inventory-page {
+    padding: 0.25rem 0 1.5rem;
+  }
+
+  .inventory-toolbar {
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .inventory-toolbar input {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .filter-panel label {
+    width: 100%;
+    flex-basis: 100%;
+  }
+
+  .table-section-heading {
+    flex-wrap: wrap;
+  }
+
+  .table-count {
+    max-width: 100%;
+  }
+
+  .inventory-table tbody tr {
+    min-width: 0;
+  }
+
+  .inventory-table td {
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  .modal {
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .inventory-header {
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .inventory-heading {
+    width: 100%;
+  }
+
+  .inventory-header .register-button {
+    width: 100%;
+  }
+}
+
+/* Celulares */
+@media (max-width: 30rem) {
+  .inventory-page {
+    width: 100%;
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .inventory-heading {
+    gap: 0.625rem;
+  }
+
+  .inventory-header h1 {
+    font-size: 1.4375rem;
+    overflow-wrap: anywhere;
+  }
+
+  .inventory-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stat-card {
+    min-width: 0;
+    padding: 0.875rem;
+  }
+
+  .stat-card strong {
+    font-size: 1.375rem;
+    overflow-wrap: anywhere;
+  }
+
+  .inventory-tabs {
+    max-width: 100%;
+    scrollbar-width: thin;
+  }
+
+  .register-options,
+  .future-grid,
+  .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .quantity-unit-control {
+    min-width: 0;
+    gap: 0.375rem;
+  }
+
+  .quantity-unit-control input {
+    min-width: 0;
+  }
+
+  .modal-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .modal-actions .button-text {
+    grid-column: auto;
+  }
+
+  .movements-card {
+    min-width: 0;
+  }
+}
+
+/* Celulares muito estreitos */
+@media (max-width: 22.5rem) {
+  .inventory-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .inventory-table tbody tr,
+  .movements-table tbody tr {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .inventory-table td,
+  .movements-table td {
+    grid-column: 1 / -1;
+  }
+
+  .inventory-menu-button {
+    width: 2.375rem;
+    height: 2.375rem;
+  }
+
+  .quantity-unit-control select {
+    flex-basis: 5.625rem;
+    width: 5.625rem;
+  }
+}
+
+/* Respeita usuários que preferem menos animações */
+@media (prefers-reduced-motion: reduce) {
+  .inventory-page *,
+  .inventory-page *::before,
+  .inventory-page *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

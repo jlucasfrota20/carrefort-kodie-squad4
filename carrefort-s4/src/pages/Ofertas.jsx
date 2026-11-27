@@ -24,7 +24,7 @@ function formatQuantity(value, unit) {
   })} ${unit || "UN"}`;
 }
 
-function Ofertas({ onNavigate }) {
+function Ofertas({ onNavigate, onMenuClick }) {
   const [products, setProducts] = useState([]);
   const [lots, setLots] = useState([]);
   const [movements, setMovements] = useState([]);
@@ -240,19 +240,40 @@ function Ofertas({ onNavigate }) {
   return (
     <div className="offers-page">
 
-      {/* CABEÇALHO */}
+            {/* CABEÇALHO */}
       <header className="offers-header">
-        <div>
-          <span className="page-eyebrow">
-            OPORTUNIDADES DE VENDA
-          </span>
+        <div className="offers-heading">
+          <button
+            type="button"
+            className="offers-menu-button"
+            onClick={onMenuClick}
+            aria-label="Abrir menu de navegação"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
 
-          <h1>Ofertas de última hora</h1>
+          <div className="offers-heading-copy">
+            <span className="page-eyebrow">
+              OPORTUNIDADES DE VENDA
+            </span>
 
-          <p>
-            Gerencie os produtos que podem ser disponibilizados
-            na vitrine dos clientes.
-          </p>
+            <h1>Ofertas de última hora</h1>
+
+            <p>
+              Gerencie os produtos que podem ser disponibilizados
+              na vitrine dos clientes.
+            </p>
+          </div>
         </div>
 
         <button
