@@ -2,6 +2,8 @@
 O Carrefort é um sistema desenvolvido para ajudar supermercados a reduzir o desperdício de alimentos próximos do vencimento.
 O MVP permite cadastrar produtos e lotes, acompanhar alertas de validade, publicar ofertas de última hora e registrar produtos vendidos, doados ou descartados.
 
+Link do Deploy: [CARREFORT](https://carrefort-kodie-squad4.vercel.app/)
+
 ### Tecnologias:
 
 <img src="https://skillicons.dev/icons?i=html,css,js,react,vite,vercel,supabase,git"/><br>
