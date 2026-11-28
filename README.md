@@ -37,7 +37,7 @@ Para informações detalhadas sobre a solução, analise o PRD em [PRD - Product
 - [Prompt Master - AI Builder](/docs/AIBuilder-MasterPrompt.md)
 - [PRD - Product Owner](/docs/ProductOwner-PRD.md)
 - [QA & Privacy Review - QA e Privacy](/docs/QA&Privacy.md)
-- [Wireframe - UI/UX Designer](/docs/UX_UIDesigner-Wireframe.md)
+- [Wireframe - UI/UX Designer](/docs/UX_UIDesigner-Wireframe.md)  *Os templates das telas completas estão na pasta [TEMPLATE](/template)
 
 ***
 
