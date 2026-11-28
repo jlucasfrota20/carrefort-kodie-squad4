@@ -1,4 +1,4 @@
-# PRD — Carrefort Validade em Dia
+# PRD — Carrefort
 
 **Equipe:** StackUp
 
